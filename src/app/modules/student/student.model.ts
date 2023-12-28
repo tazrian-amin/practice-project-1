@@ -7,8 +7,8 @@ import {
   StudentModel,
   TUserName,
 } from './student.interface';
-import bcrypt from 'bcrypt';
-import config from '../../config';
+import AppError from '../../errors/AppError';
+import httpStatus from 'http-status';
 
 //create schema
 const userNameSchema = new Schema<TUserName>({
@@ -83,10 +83,11 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       required: [true, 'Student ID is required'],
       unique: true,
     },
-    password: {
-      type: String,
-      required: [true, 'Password is required'],
-      minlength: [6, 'Password must have at least 6 characters'],
+    user: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'User id is required'],
+      unique: true,
+      ref: 'User',
     },
     name: { type: userNameSchema, required: true },
     gender: {
@@ -132,11 +133,15 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       required: [true, 'Local guardian details are required'],
     },
     profileImage: { type: String },
-    isActive: {
-      type: String,
-      enum: ['active', 'blocked'],
-      default: 'active',
-      required: [true, 'Active status is required'],
+    admissionSemester: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'Admission semester is required'],
+      ref: 'AcademicSemester',
+    },
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'Academic Department is required'],
+      ref: 'AcademicDepartment',
     },
     isDeleted: {
       type: Boolean,
@@ -151,27 +156,22 @@ const studentSchema = new Schema<TStudent, StudentModel>(
 );
 
 studentSchema.virtual('fullName').get(function () {
-  return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
-});
-
-//using pre Document middleware / hook
-studentSchema.pre('save', async function (next) {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this; //this refers to the current document, here the studentData
-  user.password = await bcrypt.hash(
-    this.password,
-    Number(config.bcrypt_salt_rounds),
-  );
-  next();
-});
-
-//using post Document middleware / hook
-studentSchema.post('save', function (doc, next) {
-  doc.password = '';
-  next();
+  return this.name
+    ? `${this?.name?.firstName} ${this?.name?.middleName} ${this?.name?.lastName}`
+    : '';
 });
 
 //using Query middleware / hook
+studentSchema.pre('save', async function (next) {
+  const isStudentExists = await Student.findOne({
+    id: this.id,
+  });
+  if (isStudentExists) {
+    throw new AppError(httpStatus.CONFLICT, 'Student already exists');
+  }
+  next();
+});
+
 studentSchema.pre('find', function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();

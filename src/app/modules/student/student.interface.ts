@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 //create interface
 export type TUserName = {
@@ -6,6 +6,18 @@ export type TUserName = {
   middleName: string;
   lastName: string;
 };
+
+export type TGender = 'male' | 'female' | 'other';
+
+export type TBloodGroup =
+  | 'A+'
+  | 'A-'
+  | 'B+'
+  | 'B-'
+  | 'AB+'
+  | 'AB-'
+  | 'O+'
+  | 'O-';
 
 export type TGuardian = {
   fatherName: string;
@@ -25,20 +37,21 @@ export type TLocalGuardian = {
 
 export type TStudent = {
   id: string;
-  password: string;
+  user: Types.ObjectId;
   name: TUserName;
-  gender: 'male' | 'female' | 'other';
+  gender: TGender;
   dateOfBirth?: string;
   email: string;
   contactNo: string;
   emergencyContactNo: string;
-  bloodGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
+  bloodGroup?: TBloodGroup;
   presentAddress: string;
   permanentAddress: string;
   guardian: TGuardian;
   localGuardian: TLocalGuardian;
   profileImage?: string;
-  isActive: 'active' | 'blocked';
+  admissionSemester: Types.ObjectId;
+  academicDepartment: Types.ObjectId;
   isDeleted: boolean;
 };
 

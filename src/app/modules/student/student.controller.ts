@@ -1,100 +1,63 @@
-import { Request, Response } from 'express';
+import httpStatus from 'http-status';
+import catchAsync from '../../utils/catchAsync';
+import sendResponse from '../../utils/sendResponse';
 import { StudentServices } from './student.service';
-import studentValidationSchema from './student.validation';
 
-const createStudent = async (req: Request, res: Response) => {
-  try {
-    const { student: studentData } = req.body;
+const getAllStudents = catchAsync(async (req, res) => {
+  const searchQuery = req.query;
 
-    //data validation using zod
-    const zodParsedData = studentValidationSchema.parse(studentData);
+  const result = await StudentServices.getAllStudentsFromDB(searchQuery);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Students data retrieved successfully',
+    data: result,
+  });
+});
 
-    const result = await StudentServices.createStudentIntoDB(zodParsedData);
+const getSingleStudent = catchAsync(async (req, res) => {
+  const { studentId } = req.params;
 
-    res.status(200).json({
-      success: true,
-      message: 'Student created successfully',
-      data: result,
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    console.log(error);
-    res.json({
-      success: false,
-      message:
-        error.message ?? 'Something went wrong, could not create new student',
-    });
-  }
-};
+  const result = await StudentServices.getSingleStudentFromDB(studentId);
 
-const getAllStudents = async (req: Request, res: Response) => {
-  try {
-    const result = await StudentServices.getAllStudentsFromDB();
-    res.status(200).json({
-      success: true,
-      message: 'Students data retrieved successfully',
-      data: result,
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    console.log(error);
-    res.json({
-      success: false,
-      message:
-        error.message ?? 'Something went wrong, could not get students data',
-    });
-  }
-};
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Student data retrieved successfully',
+    data: result,
+  });
+});
 
-const getSingleStudent = async (req: Request, res: Response) => {
-  try {
-    const { studentId } = req.params;
+const updateStudent = catchAsync(async (req, res) => {
+  const { studentId } = req.params;
+  const { student } = req.body;
 
-    const result = await StudentServices.getSingleStudentFromDB(studentId);
+  const result = await StudentServices.updateStudentIntoDB(studentId, student);
 
-    res.status(200).json({
-      success: true,
-      message: 'Student data retrieved successfully',
-      data: result,
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    console.log(error);
-    res.json({
-      success: false,
-      message:
-        error.message ??
-        "Something went wrong, could not get the student's data",
-    });
-  }
-};
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Student data updated successfully',
+    data: result,
+  });
+});
 
-const deleteStudent = async (req: Request, res: Response) => {
-  try {
-    const { studentId } = req.params;
+const deleteStudent = catchAsync(async (req, res) => {
+  const { studentId } = req.params;
 
-    const result = await StudentServices.deleteStudentFromDB(studentId);
+  const result = await StudentServices.deleteStudentFromDB(studentId);
 
-    res.status(200).json({
-      success: true,
-      message: 'Student data deleted successfully',
-      data: result,
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    console.log(error);
-    res.json({
-      success: false,
-      message:
-        error.message ??
-        "Something went wrong, could not delete the student's data",
-    });
-  }
-};
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Student data deleted successfully',
+    data: result,
+  });
+});
 
 export const StudentControllers = {
-  createStudent,
   getAllStudents,
   getSingleStudent,
+  updateStudent,
   deleteStudent,
 };
