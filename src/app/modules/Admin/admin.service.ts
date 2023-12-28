@@ -35,7 +35,7 @@ const updateAdminIntoDB = async (id: string, payload: Partial<TAdmin>) => {
 
   processField('name', name, modifiedUpdatedData);
 
-  const result = await Admin.findByIdAndUpdate({ id }, modifiedUpdatedData, {
+  const result = await Admin.findByIdAndUpdate(id, modifiedUpdatedData, {
     new: true,
     runValidators: true,
   });
