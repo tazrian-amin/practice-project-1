@@ -11,69 +11,87 @@ import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 
 //create schema
-const userNameSchema = new Schema<TUserName>({
-  firstName: {
-    type: String,
-    required: [true, 'First name is required'],
-    trim: true,
-    maxlength: [20, 'First name cannot have more than 20 characters'],
-    validate: {
-      validator: function (value: string) {
-        const firstNameStr =
-          value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-        return firstNameStr === value;
+const userNameSchema = new Schema<TUserName>(
+  {
+    firstName: {
+      type: String,
+      required: [true, 'First name is required'],
+      trim: true,
+      maxlength: [20, 'First name cannot have more than 20 characters'],
+      validate: {
+        validator: function (value: string) {
+          const firstNameStr =
+            value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+          return firstNameStr === value;
+        },
+        message: '{VALUE} is not in correct format',
       },
-      message: '{VALUE} is not in correct format',
+    },
+    middleName: {
+      type: String,
+      required: [true, 'Middle name is required'],
+      trim: true,
+    },
+    lastName: {
+      type: String,
+      required: [true, 'Last name is required'],
+      trim: true,
     },
   },
-  middleName: {
-    type: String,
-    required: [true, 'Middle name is required'],
-    trim: true,
+  {
+    _id: false,
   },
-  lastName: {
-    type: String,
-    required: [true, 'Last name is required'],
-    trim: true,
-  },
-});
+);
 
-const guardianSchema = new Schema<TGuardian>({
-  fatherName: { type: String, required: [true, "Father's name is required"] },
-  fatherOccupation: {
-    type: String,
-    required: [true, "Father's occupation is required"],
+const guardianSchema = new Schema<TGuardian>(
+  {
+    fatherName: { type: String, required: [true, "Father's name is required"] },
+    fatherOccupation: {
+      type: String,
+      required: [true, "Father's occupation is required"],
+    },
+    fatherContactNo: {
+      type: String,
+      required: [true, "Father's contact number is required"],
+    },
+    motherName: { type: String, required: [true, "Mother's name is required"] },
+    motherOccupation: {
+      type: String,
+      required: [true, "Mother's occupation is required"],
+    },
+    motherContactNo: {
+      type: String,
+      required: [true, "Mother's contact number is required"],
+    },
   },
-  fatherContactNo: {
-    type: String,
-    required: [true, "Father's contact number is required"],
+  {
+    _id: false,
   },
-  motherName: { type: String, required: [true, "Mother's name is required"] },
-  motherOccupation: {
-    type: String,
-    required: [true, "Mother's occupation is required"],
-  },
-  motherContactNo: {
-    type: String,
-    required: [true, "Mother's contact number is required"],
-  },
-});
+);
 
-const localGuardianSchema = new Schema<TLocalGuardian>({
-  name: { type: String, required: [true, "Local guardian's name is required"] },
-  occupation: {
-    type: String,
-    required: [true, "Local guardian's occupation is required"],
+const localGuardianSchema = new Schema<TLocalGuardian>(
+  {
+    name: {
+      type: String,
+      required: [true, "Local guardian's name is required"],
+    },
+    occupation: {
+      type: String,
+      required: [true, "Local guardian's occupation is required"],
+    },
+    contactNo: {
+      type: String,
+      required: [true, "Local guardian's contact number is required"],
+    },
+    address: {
+      type: String,
+      required: [true, "Local guardian's address is required"],
+    },
   },
-  contactNo: {
-    type: String,
-    required: [true, "Local guardian's contact number is required"],
+  {
+    _id: false,
   },
-  address: {
-    type: String,
-    required: [true, "Local guardian's address is required"],
-  },
-});
+);
 
 // const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>({
 const studentSchema = new Schema<TStudent, StudentModel>(
